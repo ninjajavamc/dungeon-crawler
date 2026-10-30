@@ -62,7 +62,7 @@ test('every test room builds at every depth, dressed in its theme, with nothing 
   const depths = name => name === 'boss' ? Object.keys(BOSSES).map(Number) : Array.from({ length: 20 }, (_, i) => i + 1);
   for (const name of TEST_ROOM_NAMES) for (const d of depths(name)) {
     const k = testRoomKey(name, d), m = w.cube(k).map;
-    assert.equal(m.key, k); assert.equal(m.depth || 0, d); assert.equal(m.biome, w.layout(d).theme.props);
+    assert.equal(m.key, k); assert.equal(m.depth || 0, d); assert.equal(m.biome, name === 'waterfall' ? 'peaks' : w.layout(d).theme.props);
     assert.deepEqual(m.portals, []); assert.equal(m.populationScale, 0); assert.deepEqual(m.authoredProps ?? [], []);
     assert.equal(m.testRoom.name, name);
     for (let c = 0; c < N * N; c++) assert.ok(m.cols[c].some(f => f.layer === 0 && f.bottom === 0), `${name}: ground in every cell`);

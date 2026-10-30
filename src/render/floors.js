@@ -165,7 +165,11 @@ function fluidVolume(m, f, b) {
 
 export function buildFloors(m, layers) {
   if (m.interior) return buildInteriorFloors(m, layers);
-  for (const f of m.floors) {
+  for (const floor of m.floors) {
+    // Rock formations retain their collision floors, but have faceted stone faces instead
+    // of square terrace walls. Ground-level rocks still need the ordinary floor underneath.
+    if (floor.waterfallRock && floor.layer > 0) continue;
+    const f = floor.waterfallRock ? { ...floor, top: 4, cs: [2, 2, 2, 2] } : floor;
     if (f.crust) continue;   // the crumbling crust: drawn on its own, it falls (render/trials.js)
     const L = layers[f.layer], x = f.x, z = f.z, cs = f.cs, B = f.surface === 'masonry' ? L.stone : L.terrain;
     const P = [[x, cs[0], z], [x + 1, cs[1], z], [x, cs[2], z + 1], [x + 1, cs[3], z + 1]];

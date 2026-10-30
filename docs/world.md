@@ -1001,22 +1001,29 @@ the visual hint; no discovery marker is added.
 The water curtain uses the existing `map.doors` interaction and house-door transitions, not a second
 travel system. There is no visible wooden door or frame outside: swimming into the curtain
 enters the room. Only these `swim` entrances allow an ungrounded swimmer to transition;
-ordinary house doors still require grounded feet. Returning restores a swimming pose in the
-pool, retaining the ordinary dry respawn fallback. Its destination, `interior:waterfall:<outside key>`,
-retains the interior key namespace for save/travel compatibility but is visually an ordinary
-peaceful dark forest: normal terrain and ambient forest dressing, no house, wooden floor,
-windows or stairs. A small waterfall (0.9 cells wide, falling 1.5 cells) pours into a swimming
-pool with a sloping shore; swimming back through it returns outside. A reserved clearing keeps
-the approach to one ordinary uncommon reward-site chest accessible. The forest inherits the
-outside depth, but uses the dark-forest biome. Chest identities and contents are deterministic and use the normal
-run's opened-chest persistence, so leaving and returning cannot farm the reward. These rooms
+ordinary house doors still require grounded feet. Curtain transitions clear held movement
+through the existing input-reset helper, so the arriving swimmer cannot immediately bounce back.
+Returning restores a swimming pose in the pool, retaining the ordinary dry respawn fallback.
+The destination, `interior:waterfall:<outside key>`, retains the interior key namespace for
+save/travel compatibility but is a peaceful rock grotto: grey faceted walls around an open
+stone floor, no house, wooden flooring, stairs, trees or forest clutter. A smaller waterfall
+(1.2 cells wide, falling 3 cells) pours between rocks at the back into a swimming pool with a
+sloping shore. Swimming back through it returns outside. An ordinary uncommon reward-site
+chest stands in the unobstructed middle. The grotto inherits the outside depth and uses the
+neutral peaks palette. Its rocks use the normal merged stone geometry and existing wall
+cutaway, not another renderer. Chest identities and contents are deterministic and use the
+normal run's opened-chest persistence, so leaving and returning cannot farm the reward. These rooms
 follow the existing interior save/menu policy (reloading from an interior starts in town).
 The town portal remains disabled in these off-grid rooms; the hideout asks players to swim
 back through the small waterfall.
 
 Developer preview: `/waterfall` works with any seed, using the ordinary test-room framework.
 It places the hero swimming in a deep pool in front of a deliberately broad waterfall.
-Swim into the curtain to enter the forest. Return through its small waterfall and use
+The entrance is a freestanding grey rock formation near the middle of the room, with tall
+irregular side rocks and an upper basin, not a cliff on the cube boundary. The rock formation
+and pool keep several cells of clearance from every boundary. This visual preview uses the
+neutral peaks palette regardless of the surrounding depth.
+Swim into the curtain to enter the grotto. Return through its small waterfall and use
 `/testroom leave` to go back to the original world position. `/testroom waterfall` is equivalent. Existing test-room keys are unchanged.
 
 Natural-generation check: open `?dev=1&seed=123`, then `/goto 3 3,3`. The broad waterfall in

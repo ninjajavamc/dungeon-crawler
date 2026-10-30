@@ -294,22 +294,36 @@ function bossRoom(spec) {
 function waterfallRoom(spec) {
   const ctx = start(spec);
   for (let z = 0; z < N; z++) for (let x = 0; x < N; x++) {
-    const pool = x >= 6 && x <= 10 && z >= 6 && z <= 9;
+    const corner = (x === 6 || x === 10) && (z === 9 || z === 12);
+    const pool = x >= 6 && x <= 10 && z >= 9 && z <= 12 && !corner;
     ctx.put(x, z, { top: pool ? 0 : 4, ...(pool ? { fluid: WATER, surf: 3 } : {}) });
-    if (x >= 4 && x <= 12 && z >= 1 && z <= 5) {
-      const channel = x >= 7 && x <= 9;
-      ctx.put(x, z, { top: channel ? 10 : 13, bottom: 8, layer: 1,
-        ...(channel ? { fluid: WATER, surf: 12 } : {}) });
+    // A freestanding rock formation in the middle, with tall side rocks and a basin
+    // between them. All its sides are several cells away from the cube boundary.
+    if (x >= 6 && x <= 10 && z >= 5 && z <= 8) {
+      const channel = x >= 7 && x <= 9 && z >= 6;
+      const back = 6.5 + (z - 5) * 0.2, top = Math.round((back + 0.1) / LH);
+      const f = ctx.put(x, z, { top: channel ? 10 : top, bottom: channel ? 8 : 4, layer: 1,
+        ...(channel ? { fluid: WATER, surf: 12 } : { cs: [back + 0.1, back - 0.1, back + 0.3, back + 0.1] }) });
+      f.waterfallRock = !channel;   // faceted rock faces rather than square terrace walls
     }
   }
-  ctx.falls.push({ c: idx(8, 6), d: 2, top: 12, bot: 3, type: WATER, layer: 0, width: 3.2 });
+  ctx.falls.push({ c: idx(8, 9), d: 2, top: 12, bot: 3, type: WATER, layer: 0, width: 3.2 });
   ctx.stats.fluids.push('broad waterfall with a hidden door');
-  const m = finish(ctx, spec, { K: 2, B: [0, 8], arrival: { x: 5.5, z: 10.5, yaw: Math.PI }, note: WATERFALL_HINT });
+  const m = finish(ctx, spec, { K: 2, B: [0, 8], arrival: { x: 5.5, z: 11.5, yaw: Math.PI }, note: WATERFALL_HINT });
   m.doors = [{ id: 'waterfall', building: 'waterfall:' + spec.key, to: waterfallRoomKey(spec.key),
-    x: 8.5, y: 1, z: 6.1, nx: 0, nz: 1, w: 2.2, layer: 0, waterfall: true, swim: true }];
+    x: 8.5, y: 1, z: 9.1, nx: 0, nz: 1, w: 2.2, layer: 0, waterfall: true, swim: true }];
   // Arrive on the dry ledge under the overhang, not on the channel over it.
-  m.testRoom.arrival = { x: 8.5, y: 2, z: 5.7, yaw: Math.PI };
-  m.swimArrival = { x: 8.5, y: 1, z: 8.5, yaw: Math.PI };
+  m.waterfallRocks = [
+    { x: 6.2, z: 7, width: 2.2, depth: 4, height: 6, leanX: -0.25, leanZ: 0.2 },
+    { x: 10.8, z: 7, width: 2.2, depth: 4, height: 5.6, leanX: 0.35, leanZ: -0.2 },
+    { x: 8.5, z: 5.4, width: 5, depth: 1.6, height: 4.6, leanX: 0, leanZ: -0.1 },
+  ];
+  m.staticBlockers = m.blockers = indexBlockers(m.waterfallRocks.map(r => ({ shape: 'box',
+    x0: r.x - r.width / 2, x1: r.x + r.width / 2, z0: r.z - r.depth / 2, z1: r.z + r.depth / 2,
+    bottom: 2, top: 2 + r.height + 0.3 })));
+  m.biome = 'peaks';   // neutral grey rock rather than the current depth's vegetation
+  m.testRoom.arrival = { x: 8.5, y: 2, z: 8.7, yaw: Math.PI };
+  m.swimArrival = { x: 8.5, y: 1, z: 11.5, yaw: Math.PI };
   return m;
 }
 

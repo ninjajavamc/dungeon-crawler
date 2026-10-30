@@ -201,7 +201,7 @@ export function setCut(y, map, px, py, pz, walls = true) {
   // cave and canyon walls (and the walls of a house, inside) on the camera's side come down to a little
   // over the character
   // inside a house they go entirely, down to the floor, with what hangs on them (not the door)
-  const inside = map?.interior, room = inside?.room, t = inside?.wall ?? 0;
+  const inside = map?.interior ?? map?.rockRoom, room = inside?.room, t = inside?.wall ?? 0;
   // (only the walls' own mesh there: not the floors, the stair or the railing beside them)
   if (room) { U.uWallBox.value.set(room.x0 - t, room.x1 + t, room.z0 - t, room.z1 + t); U.uWallBand.value = t + WALL_CUT; U.uFrontKinds.value.set(0, 1, 0, 0); U.uFrontCorners.value = 0; }
   // (Flip's box: what stands out of its walls comes down with them, cubegen/fliparena.js)

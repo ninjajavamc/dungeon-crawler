@@ -10,6 +10,7 @@ import { enterCube } from './flow.js';
 import { cancelSword } from './sword.js';
 import { cancelCast } from './townportal.js';
 import { clearMouseInput } from './orders.js';
+import { clearInput } from './inputstate.js';
 import { tr } from '../i18n/i18n.js';
 
 const FADE_MS = 380;
@@ -27,6 +28,9 @@ export function takeDoor(d) {
   state.transitioning = true;
   state.portalCharge = null;
   cancelCast(); cancelSword(true); clearMouseInput();
+  // A curtain opens into a fixed grotto layout: stop held swimming input at the fade,
+  // rather than immediately steering the arriving swimmer into the return passage.
+  if (d.swim) clearInput();
   sfx('door', { at: player });
   fadeOut();
   setTimeout(() => whenReady(cubes.get(d.to)).then(c => {

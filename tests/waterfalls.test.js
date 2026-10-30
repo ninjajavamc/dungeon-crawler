@@ -8,7 +8,7 @@ import { testRoomKey, TEST_ROOM_NAMES } from '../src/world/testrooms.js';
 import { doorArrival, doorBack, atDoor } from '../src/core/doors.js';
 import { player } from '../src/game/state.js';
 import { supportedPoint, respawnPoint } from '../src/physics/respawn.js';
-import { WATER, LAVA, ACID, CHAR_R } from '../src/core/constants.js';
+import { N, WATER, LAVA, ACID, CHAR_R } from '../src/core/constants.js';
 import { buildCubeParts } from '../src/render/cubegeo.js';
 import { generate } from '../src/cubegen/index.js';
 import { chestLoot } from '../src/core/chests.js';
@@ -46,12 +46,14 @@ test('both doors use the existing arrival, walk-in and return rules with dry sup
   }
 });
 
-test('hideouts are ordinary peaceful forests with a small waterfall and one persistent ordinary chest', () => {
+test('hideouts are peaceful rock grottos with a small waterfall and one persistent ordinary chest', () => {
   assert.equal(room.enemyFree, true); assert.equal(room.depth, outside.depth);
   assert.equal(room.roomOutside.outside, outside.key); assert.equal(room.waterfallRoom, true);
-  assert.equal(room.interior, undefined); assert.equal(room.biome, 'darkforest');
+  assert.equal(room.interior, undefined); assert.equal(room.biome, 'peaks');
+  assert.equal(room.cave, true); assert.equal(room.walled, true);
+  assert.ok(room.waterfallRocks.length >= 4);
   assert.equal(room.doors.length, 1); assert.equal(room.rewardSites.length, 1);
-  assert.equal(room.authoredProps, undefined, 'use ordinary forest dressing');
+  assert.deepEqual(room.authoredProps.map(p => p.name), ['treasure_chest'], 'no trees or house furniture');
   assert.equal(room.runs.length, 0); assert.equal(room.falls.length, 1);
   assert.ok(room.falls[0].width < outside.falls.find(f => f.width).width);
   assert.ok(!buildCubeParts(room).parts.wood?.pos.length, 'no wooden house floor or stairs');
@@ -84,8 +86,15 @@ test('the waterfall command preview has a supported entrance and a real two-way 
     const a = m.testRoom.arrival;
     assert.ok(supportedPoint(a.x, a.y, a.z));
     assert.equal(m.falls[0].width, 3.2);
+    assert.equal(m.biome, 'peaks');
+    const fall = m.falls[0];
+    assert.ok(fall.c % N >= 4 && fall.c % N <= N - 5 && Math.floor(fall.c / N) >= 4 && Math.floor(fall.c / N) <= N - 5);
+    for (const f of m.floors.filter(f => f.layer === 1 || f.fluid))
+      assert.ok(f.x >= 4 && f.x <= 11 && f.z >= 4 && f.z <= 12, 'rocks, basin and pool stay well inside the room');
     const d = m.doors[0], r = w.cube(d.to).map;
-    assert.ok(doorBack(r, d, m.key));
+    const back = doorBack(r, d, m.key);
+    assert.ok(back);
+    assert.equal(back.swim, true);
     assert.equal(r.rewardSites.length, 1); assert.equal(r.enemyFree, true);
     buildCubeParts(m); buildCubeParts(r);
   }
